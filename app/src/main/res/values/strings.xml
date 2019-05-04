@@ -5,4 +5,10 @@
     <string name="title_date">数据</string>
     <string name="title_mine">我的</string>
     <string name="state">状态：</string>
+    <string name="Search">搜索</string>
+    <string name="Cancel">取消</string>
+    <string name="ble_not_supported">BLE不支持！</string>
+    <string name="Searching">搜索中……</string>
+    <string name="unknown_device">未知设备</string>
+
 </resources>
