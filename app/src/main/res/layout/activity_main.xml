@@ -65,12 +65,13 @@
         android:layout_above="@+id/navigation"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:orientation="vertical">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,6 +93,7 @@
             android:scaleType="fitCenter"
             android:maxWidth="0dp"
             android:maxHeight="1000dp"
+            android:layout_margin="20dp"
             android:adjustViewBounds="true"
             android:src="@drawable/seekbar"/>
         <android.support.v7.widget.CardView
@@ -102,27 +104,27 @@
             android:layout_margin="20dp"
             android:background="@android:color/white"
             >
-            <LinearLayout
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:orientation="horizontal"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp">
+                android:layout_marginLeft="20dp"
+                android:padding="6dp">
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_altitude"
+                    android:layout_width="56dp"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center"
+                    android:layout_alignParentStart="true">
 
-                    android:layout_weight="1">
-                    <ImageButton
-                        android:id="@+id/button_altitude"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_altitude"
-                        android:scaleType="fitCenter"
-                        android:background="@null"
-                        />
+                    <com.kangtong.crazepony.RockerView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:areaBackground="@color/colorBackground"
+                        app:rockerBackground="@drawable/ic_altitude"
+                        app:rockerRadius="28dp" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -131,20 +133,19 @@
                         android:text="高度"/>
                 </LinearLayout>
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
                     android:gravity="center"
-
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_toLeftOf="@+id/layout_forward"
+                    android:layout_toRightOf="@+id/layout_altitude"
                     android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/button_direction"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_direction"
-                        android:scaleType="fitCenter"
-                        android:background="@null"
-                        />
+
+                    <com.kangtong.crazepony.RockerView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:areaBackground="@color/colorBackground"
+                        app:rockerBackground="@drawable/ic_direction"
+                        app:rockerRadius="28dp" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -154,29 +155,30 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:id="@+id/layout_forward"
+                    android:layout_width="56dp"
                     android:gravity="center"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="20dp"
                     android:orientation="vertical">
-                    <ImageButton
-                        android:id="@+id/button_forward"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:src="@drawable/ic_forward_backward"
-                        android:scaleType="fitCenter"
-                        android:background="@null"
-                        />
+
+                    <com.kangtong.crazepony.RockerView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:areaBackground="@color/colorBackground"
+                        app:rockerBackground="@drawable/ic_forward_backward"
+                        app:rockerRadius="28dp" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="9dp"
                         android:textAlignment="center"
-                        android:text="高度"/>
+                        android:text="前后" />
                 </LinearLayout>
 
 
-            </LinearLayout>
+            </RelativeLayout>
 
         </android.support.v7.widget.CardView>
     </LinearLayout>
