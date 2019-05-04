@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Crazepony</string>
+    <string name="title_home">启动</string>
+    <string name="title_location">定位</string>
+    <string name="title_date">数据</string>
+    <string name="title_mine">我的</string>
+    <string name="state">状态：</string>
+</resources>
