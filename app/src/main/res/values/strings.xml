@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Crazepony</string>
+    <string name="app_name">智能跟随遮阳伞</string>
     <string name="title_home">启动</string>
     <string name="title_location">定位</string>
     <string name="title_date">数据</string>
@@ -10,5 +10,10 @@
     <string name="ble_not_supported">BLE不支持！</string>
     <string name="Searching">搜索中……</string>
     <string name="unknown_device">未知设备</string>
+    <string name="Disconnect">断开</string>
+    <string name="Connect">连接</string>
+    <string name="Launch">起飞</string>
+    <string name="Land">降落</string>
+    <string name="DisconnectToast">未连接设备</string>
 
 </resources>

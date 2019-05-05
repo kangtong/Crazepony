@@ -162,8 +162,8 @@ public class DeviceScanActivity extends ListActivity {
         //获得返回到主界面的数据
         final Intent intent = new Intent();
         // TODO: 2019/5/5 对接主界面
-//        intent.putExtra(BTClient.EXTRAS_DEVICE_NAME, device.getName());
-//        intent.putExtra(BTClient.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        intent.putExtra(MainActivity.EXTRAS_DEVICE_NAME, device.getName());
+        intent.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
         if (mScanning) {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;

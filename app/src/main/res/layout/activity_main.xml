@@ -32,10 +32,12 @@
             android:textColor="@android:color/white"
             />
         <ImageButton
+            android:id="@+id/btn_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add"
             android:layout_alignParentRight="true"
+            android:onClick="onConnectButtonClicked"
             android:background="@null"/>
         <TextView
             android:id="@+id/text_toast"
@@ -53,6 +55,7 @@
             android:text="START"
             android:textColor="#62A5F4"
             android:layout_centerInParent="true"
+            android:onClick="onlauchLandButtonClicked"
             />
 
     </RelativeLayout>
@@ -120,11 +123,13 @@
                     android:layout_alignParentStart="true">
 
                     <com.kangtong.crazepony.RockerView
+                        android:id="@+id/rocker_altitude"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:areaBackground="@color/colorBackground"
                         app:rockerBackground="@drawable/ic_altitude"
-                        app:rockerRadius="28dp" />
+                        app:rockerRadius="28dp"
+                        app:rockerVertical="true" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -141,17 +146,19 @@
                     android:orientation="vertical">
 
                     <com.kangtong.crazepony.RockerView
+                        android:id="@+id/rocker_direction"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:areaBackground="@color/colorBackground"
                         app:rockerBackground="@drawable/ic_direction"
-                        app:rockerRadius="28dp" />
+                        app:rockerRadius="28dp"
+                        app:rockerVertical="false" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="9dp"
                         android:textAlignment="center"
-                        android:text="高度"/>
+                        android:text="左右" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -164,11 +171,13 @@
                     android:orientation="vertical">
 
                     <com.kangtong.crazepony.RockerView
+                        android:id="@+id/rocker_forward"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:areaBackground="@color/colorBackground"
                         app:rockerBackground="@drawable/ic_forward_backward"
-                        app:rockerRadius="28dp" />
+                        app:rockerRadius="28dp"
+                        app:rockerVertical="true" />
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

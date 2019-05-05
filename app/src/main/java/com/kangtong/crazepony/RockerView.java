@@ -82,6 +82,8 @@ public class RockerView extends View {
     private int mRockerBackgroundMode = ROCKER_BACKGROUND_MODE_DEFAULT;
     private Bitmap mRockerBitmap;
     private int mRockerColor;
+    public boolean touchReadyToSend = false;
+    private boolean mIsVertical;
 
 
     public RockerView(Context context, AttributeSet attrs) {
@@ -116,7 +118,7 @@ public class RockerView extends View {
      */
     private void initAttribute(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RockerView);
-
+        mIsVertical = typedArray.getBoolean(R.styleable.RockerView_rockerVertical, true);
         // 可移动区域背景
         Drawable areaBackground = typedArray.getDrawable(R.styleable.RockerView_areaBackground);
         if (null != areaBackground) {
@@ -244,7 +246,13 @@ public class RockerView extends View {
             Rect src = new Rect(0, 0, mRockerBitmap.getWidth(), mRockerBitmap.getHeight());
 //            Rect dst = new Rect(mRockerPosition.x - mRockerRadius, mRockerPosition.y - mRockerRadius, mRockerPosition.x + mRockerRadius, mRockerPosition.y + mRockerRadius);
             // TODO: 2019/5/4 这里修改小球的方向
-            Rect dst = new Rect(mCenterPoint.x - mRockerRadius, mRockerPosition.y - mRockerRadius, mCenterPoint.x + mRockerRadius, mRockerPosition.y + mRockerRadius);
+            Rect dst;
+            if (mIsVertical) {
+                dst = new Rect(mCenterPoint.x - mRockerRadius, mRockerPosition.y - mRockerRadius, mCenterPoint.x + mRockerRadius, mRockerPosition.y + mRockerRadius);
+            } else {
+                dst = new Rect(mRockerPosition.x - mRockerRadius, mCenterPoint.y - mRockerRadius, mRockerPosition.x + mRockerRadius, mCenterPoint.y + mRockerRadius);
+
+            }
             canvas.drawBitmap(mRockerBitmap, src, dst, mRockerPaint);
         } else if (ROCKER_BACKGROUND_MODE_COLOR == mRockerBackgroundMode) {
             // 色值
@@ -304,7 +312,7 @@ public class RockerView extends View {
         double angle = radian2Angle(radian);
 
         // 回调 返回参数
-        callBack(angle);
+        callBack(angle, lenXY / regionRadius);
 
         Log.i(TAG, "getRockerPositionPoint: 角度 :" + angle);
         if (lenXY + rockerRadius <= regionRadius) { // 触摸位置在可活动范围内
@@ -380,7 +388,7 @@ public class RockerView extends View {
      *
      * @param angle 摇动角度
      */
-    private void callBack(double angle) {
+    private void callBack(double angle, float percent) {
         if (null != mOnAngleChangeListener) {
             mOnAngleChangeListener.angle(angle);
         }
@@ -390,19 +398,19 @@ public class RockerView extends View {
                     case DIRECTION_2_HORIZONTAL:// 左右方向
                         if (ANGLE_0 <= angle && ANGLE_HORIZONTAL_2D_OF_0P > angle || ANGLE_HORIZONTAL_2D_OF_1P <= angle && ANGLE_360 > angle) {
                             // 右
-                            mOnShakeListener.direction(Direction.DIRECTION_RIGHT);
+                            mOnShakeListener.direction(Direction.DIRECTION_RIGHT, percent);
                         } else if (ANGLE_HORIZONTAL_2D_OF_0P <= angle && ANGLE_HORIZONTAL_2D_OF_1P > angle) {
                             // 左
-                            mOnShakeListener.direction(Direction.DIRECTION_LEFT);
+                            mOnShakeListener.direction(Direction.DIRECTION_LEFT, percent);
                         }
                         break;
                     case DIRECTION_2_VERTICAL:// 上下方向
                         if (ANGLE_VERTICAL_2D_OF_0P <= angle && ANGLE_VERTICAL_2D_OF_1P > angle) {
                             // 下
-                            mOnShakeListener.direction(Direction.DIRECTION_DOWN);
+                            mOnShakeListener.direction(Direction.DIRECTION_DOWN, percent);
                         } else if (ANGLE_VERTICAL_2D_OF_1P <= angle && ANGLE_360 > angle) {
                             // 上
-                            mOnShakeListener.direction(Direction.DIRECTION_UP);
+                            mOnShakeListener.direction(Direction.DIRECTION_UP, percent);
                         }
                         break;
                     default:
@@ -414,22 +422,22 @@ public class RockerView extends View {
                         if ((ANGLE_0 <= angle && ANGLE_HORIZONTAL_2D_OF_0P > angle || ANGLE_HORIZONTAL_2D_OF_1P <= angle && ANGLE_360 > angle) && tempDirection != Direction.DIRECTION_RIGHT) {
                             // 右
                             tempDirection = Direction.DIRECTION_RIGHT;
-                            mOnShakeListener.direction(Direction.DIRECTION_RIGHT);
+                            mOnShakeListener.direction(Direction.DIRECTION_RIGHT, percent);
                         } else if (ANGLE_HORIZONTAL_2D_OF_0P <= angle && ANGLE_HORIZONTAL_2D_OF_1P > angle && tempDirection != Direction.DIRECTION_LEFT) {
                             // 左
                             tempDirection = Direction.DIRECTION_LEFT;
-                            mOnShakeListener.direction(Direction.DIRECTION_LEFT);
+                            mOnShakeListener.direction(Direction.DIRECTION_LEFT, percent);
                         }
                         break;
                     case DIRECTION_2_VERTICAL:// 上下方向
                         if (ANGLE_VERTICAL_2D_OF_0P <= angle && ANGLE_VERTICAL_2D_OF_1P > angle && tempDirection != Direction.DIRECTION_DOWN) {
                             // 下
                             tempDirection = Direction.DIRECTION_DOWN;
-                            mOnShakeListener.direction(Direction.DIRECTION_DOWN);
+                            mOnShakeListener.direction(Direction.DIRECTION_DOWN, percent);
                         } else if (ANGLE_VERTICAL_2D_OF_1P <= angle && ANGLE_360 > angle && tempDirection != Direction.DIRECTION_UP) {
                             // 上
                             tempDirection = Direction.DIRECTION_UP;
-                            mOnShakeListener.direction(Direction.DIRECTION_UP);
+                            mOnShakeListener.direction(Direction.DIRECTION_UP, percent);
                         }
                         break;
                     default:
@@ -527,7 +535,7 @@ public class RockerView extends View {
          *
          * @param direction 方向
          */
-        void direction(Direction direction);
+        void direction(Direction direction, float percent);
 
         // 结束
         void onFinish();
