@@ -50,6 +50,9 @@
             android:layout_centerHorizontal="true"
             android:layout_above="@+id/btn_power"
             android:layout_marginBottom="6dp"
+            android:background="@drawable/ic_notice"
+            android:paddingTop="9dp"
+            android:textAlignment="center"
             android:text="请确保安全的环境下启动"/>
         <Button
             android:id="@+id/btn_power"

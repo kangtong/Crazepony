@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 mTextState.setText(R.string.Disconnect);
+                btSendBytes(Protocol.getSendData(Protocol.MSP_ACC_CALIBRATION, Protocol.getCommandData(Protocol.MSP_ACC_CALIBRATION)));
+
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 mTextState.setText(R.string.Connect);
@@ -183,12 +185,12 @@ public class MainActivity extends AppCompatActivity {
                 switch (direction) {
                     case DIRECTION_UP:
                     case DIRECTION_LEFT:
-                        Protocol.throttle = (int) (1000 + 1000 * percent);
+                        Protocol.throttle = (int) (1500 + 300 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.throttle = (int) (1000 - 1000 * percent);
+                        Protocol.throttle = (int) (1000 - 300 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
 
