@@ -16,6 +16,7 @@
 
 package com.kangtong.crazepony;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
@@ -24,6 +25,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -156,6 +158,12 @@ public class DeviceScanActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.device_scan);
         setTitle("");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            }
+        }
+
         mHandler = new Handler();
 
         // 设定扫描按键响应

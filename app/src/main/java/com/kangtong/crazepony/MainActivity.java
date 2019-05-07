@@ -51,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     };
     private boolean mConnected = false;
     private TextView mTextState;
+    private Button mBtnPower;
+    private RockerView mRockerAltitude, mRockerDirection, mRockerForward;
+
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
@@ -100,8 +103,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    private Button mBtnPower;
-    private RockerView mRockerAltitude, mRockerDirection, mRockerForward;
+
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -127,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
 
                     mRockerAltitude.touchReadyToSend = false;
                 }
+
+                //跟新显示摇杆数据，update the joystick data
+//                updateLogData(0);
+
             } catch (Exception e) {
 
             }
@@ -177,18 +183,20 @@ public class MainActivity extends AppCompatActivity {
                 switch (direction) {
                     case DIRECTION_UP:
                     case DIRECTION_LEFT:
-                        Protocol.throttle = (int) (1000 - 1000 * percent);
+                        Protocol.throttle = (int) (1000 + 1000 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.throttle = (int) (1000 + 1000 * percent);
+                        Protocol.throttle = (int) (1000 - 1000 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
 
                 }
 //                Protocol.roll = (int) (1500 + 1000 * ((SmallRockerCircleX2 - rightTouchStartX)) / (BackRectRight2 - BackRectLeft2));
 //                Protocol.roll = constrainRange(Protocol.roll, 1000, 2000);
+                mRockerAltitude.touchReadyToSend = true;
+
             }
 
             @Override
@@ -322,11 +330,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (mConnected) {
             if (mBtnPower.getText() != land) {
+                btSendBytes(Protocol.getSendData(Protocol.ARM_IT, Protocol.getCommandData(Protocol.ARM_IT)));
                 btSendBytes(Protocol.getSendData(Protocol.LAUCH, Protocol.getCommandData(Protocol.LAUCH)));
                 mBtnPower.setText(land);
                 Protocol.throttle = Protocol.LAUCH_THROTTLE;
                 mRockerAltitude.touchReadyToSend = true;
             } else {
+                btSendBytes(Protocol.getSendData(Protocol.DISARM_IT, Protocol.getCommandData(Protocol.DISARM_IT)));
                 btSendBytes(Protocol.getSendData(Protocol.LAND_DOWN, Protocol.getCommandData(Protocol.LAND_DOWN)));
                 mBtnPower.setText(launch);
                 Protocol.throttle = Protocol.LAND_THROTTLE;
