@@ -41,13 +41,15 @@ import java.util.ArrayList;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
-    // Stops scanning after 10 seconds.每次的扫描时间最多10s
-    private static final long SCAN_PERIOD = 10000;
-    private static final int REQUEST_ENABLE_BT = 1;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
+
     private Handler mHandler;
+    // Stops scanning after 10 seconds.每次的扫描时间最多10s
+    private static final long SCAN_PERIOD = 10000;
+
+    private static final int REQUEST_ENABLE_BT = 1;
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
@@ -63,6 +65,91 @@ public class DeviceScanActivity extends ListActivity {
                     });
                 }
             };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
+        // fire an intent to display a dialog asking the user to grant permission to enable it.
+        if (!mBluetoothAdapter.isEnabled()) {
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+        }
+
+        // Initializes list view adapter.
+        mLeDeviceListAdapter = new LeDeviceListAdapter();
+        setListAdapter(mLeDeviceListAdapter);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // User chose not to enable Bluetooth.
+        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
+            finish();
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        scanLeDevice(false);
+        mLeDeviceListAdapter.clear();
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+
+        //选中BLE Crazepony飞行器，返回主界面
+        final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
+        if (device == null) return;
+
+        //获得返回到主界面的数据
+        final Intent intent = new Intent();
+        intent.putExtra(MainActivity.EXTRAS_DEVICE_NAME, device.getName());
+        intent.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
+        if (mScanning) {
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mScanning = false;
+        }
+
+        // 设置返回值并结束程序
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+
+    }
+
+    private void scanLeDevice(final boolean enable) {
+        final Button scanButton = (Button) findViewById(R.id.button_scan);
+
+        if (enable) {
+            // Stops scanning after a pre-defined scan period.
+            // 预定扫描时间之后，关闭扫描。防止进入持续扫描状态
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScanning = false;
+                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    scanButton.setText(R.string.Search);
+                }
+            }, SCAN_PERIOD);
+
+
+            mScanning = true;
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+            scanButton.setText(R.string.Searching);
+
+        } else {
+            mScanning = false;
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            scanButton.setText(R.string.Search);
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,92 +200,6 @@ public class DeviceScanActivity extends ListActivity {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
             return;
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
-        if (!mBluetoothAdapter.isEnabled()) {
-            if (!mBluetoothAdapter.isEnabled()) {
-                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }
-        }
-
-        // Initializes list view adapter.
-        mLeDeviceListAdapter = new LeDeviceListAdapter();
-        setListAdapter(mLeDeviceListAdapter);
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // User chose not to enable Bluetooth.
-        if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
-            finish();
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        scanLeDevice(false);
-        mLeDeviceListAdapter.clear();
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-
-        //选中BLE Crazepony飞行器，返回主界面
-        final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
-        if (device == null) return;
-
-        //获得返回到主界面的数据
-        final Intent intent = new Intent();
-        // TODO: 2019/5/5 对接主界面
-        intent.putExtra(MainActivity.EXTRAS_DEVICE_NAME, device.getName());
-        intent.putExtra(MainActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-        if (mScanning) {
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            mScanning = false;
-        }
-
-        // 设置返回值并结束程序
-        setResult(Activity.RESULT_OK, intent);
-        finish();
-
-    }
-
-    private void scanLeDevice(final boolean enable) {
-        final Button scanButton = (Button) findViewById(R.id.button_scan);
-
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            // 预定扫描时间之后，关闭扫描。防止进入持续扫描状态
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    scanButton.setText(R.string.Search);
-                }
-            }, SCAN_PERIOD);
-
-
-            mScanning = true;
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-            scanButton.setText(R.string.Searching);
-
-        } else {
-            mScanning = false;
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-            scanButton.setText(R.string.Search);
         }
     }
 

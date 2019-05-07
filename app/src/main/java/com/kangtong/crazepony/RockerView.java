@@ -284,7 +284,7 @@ public class RockerView extends View {
                 float upX = event.getX();
                 float upY = event.getY();
                 moveRocker(mCenterPoint.x, mCenterPoint.y);
-                Log.i(TAG, "onTouchEvent: 抬起位置 : x = " + upX + " y = " + upY);
+//                Log.i(TAG, "onTouchEvent: 抬起位置 : x = " + upX + " y = " + upY);
                 break;
         }
         return true;
@@ -314,7 +314,7 @@ public class RockerView extends View {
         // 回调 返回参数
         callBack(angle, lenXY / regionRadius);
 
-        Log.i(TAG, "getRockerPositionPoint: 角度 :" + angle);
+//        Log.i(TAG, "getRockerPositionPoint: 角度 :" + angle);
         if (lenXY + rockerRadius <= regionRadius) { // 触摸位置在可活动范围内
             return touchPoint;
         } else { // 触摸位置在可活动范围以外
@@ -333,7 +333,7 @@ public class RockerView extends View {
      */
     private void moveRocker(float x, float y) {
         mRockerPosition.set((int) x, (int) y);
-        Log.i(TAG, "onTouchEvent: 移动位置 : x = " + mRockerPosition.x + " y = " + mRockerPosition.y);
+//        Log.i(TAG, "onTouchEvent: 移动位置 : x = " + mRockerPosition.x + " y = " + mRockerPosition.y);
         invalidate();
     }
 
