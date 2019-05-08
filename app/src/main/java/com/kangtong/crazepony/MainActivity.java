@@ -51,11 +51,45 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private boolean mConnected = false;
-    private TextView mTextState;
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                timeHandler.postDelayed(this, WRITE_DATA_PERIOD);
+
+                if (IMU_CNT >= 10) {
+                    IMU_CNT = 0;
+                    //request for IMU data update，请求IMU跟新
+                    btSendBytes(Protocol.getSendData(Protocol.FLY_STATE,
+                            Protocol.getCommandData(Protocol.FLY_STATE)));
+                }
+                IMU_CNT++;
+                updateLogData(1);   //跟新IMU数据，update the IMU data
+
+
+                // process stick movement，处理摇杆数据
+                if (mRockerAltitude.touchReadyToSend == true) {
+                    btSendBytes(Protocol.getSendData(Protocol.SET_4CON,
+                            Protocol.getCommandData(Protocol.SET_4CON)));
+
+                    Log.i(TAG, "Thro: " + Protocol.throttle + ",yaw: " + Protocol.yaw + ",roll: "
+                            + Protocol.roll + ",pitch: " + Protocol.pitch);
+
+                    mRockerAltitude.touchReadyToSend = false;
+                }
+
+                //跟新显示摇杆数据，update the joystick data
+//                updateLogData(0);
+
+            } catch (Exception e) {
+
+            }
+        }
+    };
     private Button mBtnPower;
     private RockerView mRockerAltitude, mRockerDirection, mRockerForward;
     private BottomNavigationView bottomNavigationView;
-
+    private TextView mTextState, mTextLog;
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
@@ -101,45 +135,14 @@ public class MainActivity extends AppCompatActivity {
 
                 //解析得到的数据，获得MSP命令编号
                 reCmd = Protocol.processDataIn(data, data.length);
-//                updateLogData(1);   //跟新IMU数据，update the IMU data
             }
+
         }
     };
 
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                timeHandler.postDelayed(this, WRITE_DATA_PERIOD);
-
-                if (IMU_CNT >= 10) {
-                    IMU_CNT = 0;
-                    //request for IMU data update，请求IMU跟新
-                    btSendBytes(Protocol.getSendData(Protocol.FLY_STATE,
-                            Protocol.getCommandData(Protocol.FLY_STATE)));
-                }
-                IMU_CNT++;
-
-
-                // process stick movement，处理摇杆数据
-                if (mRockerAltitude.touchReadyToSend == true) {
-                    btSendBytes(Protocol.getSendData(Protocol.SET_4CON,
-                            Protocol.getCommandData(Protocol.SET_4CON)));
-
-                    Log.i(TAG, "Thro: " + Protocol.throttle + ",yaw: " + Protocol.yaw + ",roll: "
-                            + Protocol.roll + ",pitch: " + Protocol.pitch);
-
-                    mRockerAltitude.touchReadyToSend = false;
-                }
-
-                //跟新显示摇杆数据，update the joystick data
-//                updateLogData(0);
-
-            } catch (Exception e) {
-
-            }
-        }
-    };
+    private void updateLogData(int i) {
+        mTextLog.setText("Pitch Ang: " + Protocol.pitchAng + "Roll Ang: " + Protocol.rollAng + "Throttle:" + Integer.toString(Protocol.throttle));
+    }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -162,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTextState = findViewById(R.id.text_state);
+        mTextLog = findViewById(R.id.text_log);
         mBtnPower = findViewById(R.id.btn_power);
         mRockerAltitude = findViewById(R.id.rocker_altitude);
         mRockerDirection = findViewById(R.id.rocker_direction);
@@ -197,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.throttle = (int) (1000 - 300 * percent);
+                        Protocol.throttle = (int) (1500 - 300 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
 

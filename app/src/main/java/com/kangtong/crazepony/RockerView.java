@@ -281,10 +281,8 @@ public class RockerView extends View {
             case MotionEvent.ACTION_CANCEL:// 移出区域
                 // 回调 结束
                 callBackFinish();
-                float upX = event.getX();
-                float upY = event.getY();
+                mRockerPosition = getRockerPositionPoint(mCenterPoint, new Point(mCenterPoint.x, mCenterPoint.y), mAreaRadius, mRockerRadius);
                 moveRocker(mCenterPoint.x, mCenterPoint.y);
-//                Log.i(TAG, "onTouchEvent: 抬起位置 : x = " + upX + " y = " + upY);
                 break;
         }
         return true;
