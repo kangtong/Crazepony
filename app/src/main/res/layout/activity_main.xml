@@ -210,7 +210,6 @@
         android:layout_height="wrap_content"
         android:background="?android:attr/windowBackground"
         android:layout_alignParentBottom="true"
-        android:clickable="false"
         app:menu="@menu/navigation" />
 
 </RelativeLayout>

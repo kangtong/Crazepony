@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTextState;
     private Button mBtnPower;
     private RockerView mRockerAltitude, mRockerDirection, mRockerForward;
+    private BottomNavigationView bottomNavigationView;
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -74,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 mTextState.setText(R.string.Disconnect);
-                btSendBytes(Protocol.getSendData(Protocol.MSP_ACC_CALIBRATION, Protocol.getCommandData(Protocol.MSP_ACC_CALIBRATION)));
-
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 mTextState.setText(R.string.Connect);
@@ -166,6 +166,13 @@ public class MainActivity extends AppCompatActivity {
         mRockerAltitude = findViewById(R.id.rocker_altitude);
         mRockerDirection = findViewById(R.id.rocker_direction);
         mRockerForward = findViewById(R.id.rocker_forward);
+        bottomNavigationView = findViewById(R.id.navigation);
+        bottomNavigationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btSendBytes(Protocol.getSendData(Protocol.MSP_ACC_CALIBRATION, Protocol.getCommandData(Protocol.MSP_ACC_CALIBRATION)));
+            }
+        });
 
         //绑定BLE收发服务mServiceConnection
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
