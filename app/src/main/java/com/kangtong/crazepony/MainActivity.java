@@ -10,9 +10,11 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 // process stick movement，处理摇杆数据
-                if (mRockerAltitude.touchReadyToSend == true) {
+                if (mRockerAltitude.touchReadyToSend == true || mRockerDirection.touchReadyToSend == true || mRockerForward.touchReadyToSend == true) {
                     btSendBytes(Protocol.getSendData(Protocol.SET_4CON,
                             Protocol.getCommandData(Protocol.SET_4CON)));
 
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
                             + Protocol.roll + ",pitch: " + Protocol.pitch);
 
                     mRockerAltitude.touchReadyToSend = false;
+                    mRockerDirection.touchReadyToSend = false;
+                    mRockerForward.touchReadyToSend = false;
                 }
 
                 //跟新显示摇杆数据，update the joystick data
@@ -141,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void updateLogData(int i) {
-        mTextLog.setText("Pitch Ang: " + Protocol.pitchAng + "Roll Ang: " + Protocol.rollAng + "Throttle:" + Integer.toString(Protocol.throttle));
+        mTextLog.setText("Pitch " + Protocol.pitch + "Roll" + Protocol.roll + "Throttle:" + Protocol.throttle + "Yaw" + Protocol.yaw);
     }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
@@ -171,10 +175,11 @@ public class MainActivity extends AppCompatActivity {
         mRockerDirection = findViewById(R.id.rocker_direction);
         mRockerForward = findViewById(R.id.rocker_forward);
         bottomNavigationView = findViewById(R.id.navigation);
-        bottomNavigationView.setOnClickListener(new View.OnClickListener() {
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 btSendBytes(Protocol.getSendData(Protocol.MSP_ACC_CALIBRATION, Protocol.getCommandData(Protocol.MSP_ACC_CALIBRATION)));
+                return false;
             }
         });
 
@@ -196,18 +201,19 @@ public class MainActivity extends AppCompatActivity {
                 switch (direction) {
                     case DIRECTION_UP:
                     case DIRECTION_LEFT:
-                        Protocol.throttle = (int) (1500 + 300 * percent);
+                        Protocol.throttle = (int) (1500 + 1000 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.throttle = (int) (1500 - 300 * percent);
+                        Protocol.throttle = (int) (1500 - 500 * percent);
                         Protocol.throttle = constrainRange(Protocol.throttle, 1000, 2000);
                         break;
 
                 }
 //                Protocol.roll = (int) (1500 + 1000 * ((SmallRockerCircleX2 - rightTouchStartX)) / (BackRectRight2 - BackRectLeft2));
 //                Protocol.roll = constrainRange(Protocol.roll, 1000, 2000);
+                Protocol.yaw = 1500;
                 mRockerAltitude.touchReadyToSend = true;
 
             }
@@ -228,16 +234,17 @@ public class MainActivity extends AppCompatActivity {
                 switch (direction) {
                     case DIRECTION_UP:
                     case DIRECTION_LEFT:
-                        Protocol.yaw = (int) (1500 - 1000 * percent);
-                        Protocol.yaw = constrainRange(Protocol.yaw, 1000, 2000);
+                        Protocol.roll = (int) (1500 - 300 * percent);
+                        Protocol.roll = constrainRange(Protocol.roll, 1000, 2000);
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.yaw = (int) (1500 + 1000 * percent);
-                        Protocol.yaw = constrainRange(Protocol.yaw, 1000, 2000);
+                        Protocol.roll = (int) (1500 + 300 * percent);
+                        Protocol.roll = constrainRange(Protocol.roll, 1000, 2000);
                         break;
 
                 }
+                mRockerDirection.touchReadyToSend = true;
             }
 
             @Override
@@ -256,16 +263,17 @@ public class MainActivity extends AppCompatActivity {
                 switch (direction) {
                     case DIRECTION_UP:
                     case DIRECTION_LEFT:
-                        Protocol.pitch = (int) (1500 + 1000 * percent);
+                        Protocol.pitch = (int) (1500 + 300 * percent);
                         Protocol.pitch = constrainRange(Protocol.pitch, 1000, 2000);
                         break;
                     case DIRECTION_DOWN:
                     case DIRECTION_RIGHT:
-                        Protocol.pitch = (int) (1500 + 1000 * percent);
+                        Protocol.pitch = (int) (1500 - 300 * percent);
                         Protocol.pitch = constrainRange(Protocol.pitch, 1000, 2000);
                         break;
 
                 }
+                mRockerForward.touchReadyToSend = true;
             }
 
             @Override
@@ -348,12 +356,16 @@ public class MainActivity extends AppCompatActivity {
                 mBtnPower.setText(land);
                 Protocol.throttle = Protocol.LAUCH_THROTTLE;
                 mRockerAltitude.touchReadyToSend = true;
+                mRockerDirection.touchReadyToSend = true;
+                mRockerForward.touchReadyToSend = true;
             } else {
                 btSendBytes(Protocol.getSendData(Protocol.DISARM_IT, Protocol.getCommandData(Protocol.DISARM_IT)));
                 btSendBytes(Protocol.getSendData(Protocol.LAND_DOWN, Protocol.getCommandData(Protocol.LAND_DOWN)));
                 mBtnPower.setText(launch);
                 Protocol.throttle = Protocol.LAND_THROTTLE;
                 mRockerAltitude.touchReadyToSend = true;
+                mRockerDirection.touchReadyToSend = true;
+                mRockerForward.touchReadyToSend = true;
             }
         } else {
             Toast.makeText(this, disconnectToast, Toast.LENGTH_SHORT).show();

@@ -51,6 +51,7 @@
             android:layout_below="@+id/text_state"
             android:layout_centerHorizontal="true"
             android:text="测试数据"
+            android:visibility="gone"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 
